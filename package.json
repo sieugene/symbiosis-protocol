@@ -1,0 +1,15 @@
+{
+  "name": "symbiosis-protocol",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/sieugene/symbiosis-protocol.git",
+  "author": "“ぽっエフゲニー” <eugenepoluakov@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.4.4",
+    "typescript": "^5.1.6"
+  },
+  "scripts": {
+    "start": "yarn tsc && node ./dist/index.js"
+  }
+}
