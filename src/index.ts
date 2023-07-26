@@ -1,10 +1,4 @@
 require('dotenv').config()
-import { bridgingExecute } from './crossSwap'
+import { run } from './mainnet/swapErc20'
 
-;(async () => {
-    try {
-        await bridgingExecute()
-    } catch (error) {
-        console.error(error)
-    }
-})()
+run()
