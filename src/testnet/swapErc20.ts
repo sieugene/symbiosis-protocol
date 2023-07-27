@@ -23,15 +23,15 @@ export async function swapErc20() {
             route,
             priceImpact,
             approveTo,
-        } = await swapping.exactIn({
-            tokenAmountIn: scenario0.tokenAmountIn,
-            tokenOut: scenario0.tokenTo,
-            from: scenario0.wallet.address,
-            to: scenario0.wallet.address,
-            revertableAddress: scenario0.wallet.address,
-            slippage: 300,
-            deadline: Date.now() + 20 * 60,
-        })
+        } = await swapping.exactIn(
+            scenario0.tokenAmountIn,
+            scenario0.tokenTo,
+            scenario0.wallet.address,
+            scenario0.wallet.address,
+            scenario0.wallet.address,
+            300,
+            Date.now() + 20 * 60
+        )
 
         console.log({
             fee: fee.toSignificant(),

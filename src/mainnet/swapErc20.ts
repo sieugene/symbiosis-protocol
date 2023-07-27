@@ -38,11 +38,7 @@ const tokenOut = new Token({
 
 async function swapErc20() {
     try {
-        const swapping = networkConfig.symbiosis.mainnet.newSwapping({
-            address: Pools[ChainId.MATIC_MAINNET]?.address as string,
-            chainId: ChainId.MATIC_MAINNET,
-            oracle: '',
-        })
+        const swapping = networkConfig.symbiosis.mainnet.newSwapping()
 
         // Calculates fee for swapping between chains and transactionRequest
         console.log('Calculating swap...')
@@ -53,15 +49,15 @@ async function swapErc20() {
             route,
             priceImpact,
             approveTo,
-        } = await swapping.exactIn({
+        } = await swapping.exactIn(
             tokenAmountIn,
             tokenOut,
-            from: networkConfig.wallet.address,
-            revertableAddress: networkConfig.wallet.address,
-            to: networkConfig.wallet.address,
-            slippage: 300,
-            deadline: Date.now() + 20 * 60,
-        })
+            networkConfig.wallet.address,
+            networkConfig.wallet.address,
+            networkConfig.wallet.address,
+            300,
+            Date.now() + 20 * 60
+        )
 
         console.log({
             fee: fee.toSignificant(),
