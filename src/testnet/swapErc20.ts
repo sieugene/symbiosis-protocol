@@ -8,11 +8,14 @@ import { Contract } from '@ethersproject/contracts'
 import { approveAbi } from '../shared/abi/approve__abi'
 import { networkConfig } from '../shared/config'
 import { scenario0 } from './scenarios'
+import { OmniPools } from '../shared/data'
 
-export async function swapErc20() {
+async function swapErc20() {
     try {
-        // @ts-ignore
-        const swapping = networkConfig.symbiosis.testnet.newSwapping()
+        const pool = OmniPools[scenario0?.fromChainId]
+        if (!pool) throw new Error('Pool not exist')
+
+        const swapping = networkConfig.symbiosis.testnet.newSwapping(pool)
 
         // Calculates fee for swapping between chains and transactionRequest
         console.log('Calculating swap...')
@@ -23,15 +26,15 @@ export async function swapErc20() {
             route,
             priceImpact,
             approveTo,
-        } = await swapping.exactIn(
-            scenario0.tokenAmountIn,
-            scenario0.tokenTo,
-            scenario0.wallet.address,
-            scenario0.wallet.address,
-            scenario0.wallet.address,
-            300,
-            Date.now() + 20 * 60
-        )
+        } = await swapping.exactIn({
+            tokenAmountIn: scenario0.tokenAmountIn,
+            tokenOut: scenario0.tokenTo,
+            from: scenario0.wallet.address,
+            to: scenario0.wallet.address,
+            revertableAddress: scenario0.wallet.address,
+            slippage: 300,
+            deadline: Date.now() + 20 * 60,
+        })
 
         console.log({
             fee: fee.toSignificant(),
@@ -76,4 +79,11 @@ export async function swapErc20() {
     } catch (e) {
         console.error(e)
     }
+}
+
+export function run() {
+    console.log('>>>')
+    swapErc20().then(() => {
+        console.log('<<<')
+    })
 }

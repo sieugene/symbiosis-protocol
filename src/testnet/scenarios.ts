@@ -1,39 +1,35 @@
-import { ChainId, Token, TokenAmount } from 'symbiosis-js-sdk'
+import { Chain, ChainId, Token, TokenAmount } from 'symbiosis-js-sdk'
 import { networkConfig } from '../shared/config'
-
-const ETH_GOERLI = '5' as any
+import { parseUnits } from '@ethersproject/units'
 
 // tokens
-const GOERLI_USDC = new Token({
-    chainId: ETH_GOERLI,
-    address: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-    name: 'USD Coin',
-    symbol: 'USDC',
-    decimals: 6,
+const BSC_USDT = new Token({
+    chainId: ChainId.BSC_TESTNET,
+    address: '0x9a01bf917477dd9f5d715d188618fc8b7350cd22',
+    name: 'Binance USD',
+    symbol: 'BUSD',
+    decimals: 18,
 })
 
-const BSC_T_BNB = new Token({
-    chainId: ChainId.BSC_TESTNET,
-    isNative: true,
-    address: '',
-    symbol: 'BNB',
-    decimals: 18,
+const MATIC_USDT = new Token({
+    name: 'USDT',
+    symbol: 'USDT',
+    address: '0x9a01bf917477dd9f5d715d188618fc8b7350cd22',
+    chainId: ChainId.MATIC_MUMBAI,
+    decimals: 6,
 })
 
 // Scenarios
 
 // Erc20 swap (method newSwapping)
 export const scenario0 = {
-    fromChainId: ETH_GOERLI,
-    toChainId: ChainId.BSC_TESTNET,
-    tokenFrom: GOERLI_USDC,
-    tokenAmountIn: new TokenAmount(
-        GOERLI_USDC,
-        '15000000' // 15 USDC
-    ),
-    tokenTo: BSC_T_BNB,
+    fromChainId: ChainId.BSC_TESTNET,
+    toChainId: ChainId.MATIC_MUMBAI,
+    tokenFrom: BSC_USDT,
+    tokenAmountIn: new TokenAmount(BSC_USDT, parseUnits('0.5').toString()),
+    tokenTo: MATIC_USDT,
     signer: networkConfig.wallet.connect(
-        networkConfig.symbiosis.testnet.getProvider(ETH_GOERLI) as any
+        networkConfig.symbiosis.testnet.getProvider(ChainId.BSC_TESTNET) as any
     ),
     wallet: networkConfig.wallet,
 }
