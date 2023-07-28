@@ -3,15 +3,18 @@
  * to BNB on BNB Chain Testnet
  */
 
-import { MaxUint256 } from '@ethersproject/constants'
-import { Contract } from '@ethersproject/contracts'
+import { TransactionResponse } from '@ethersproject/providers'
+import { BigNumber, Contract } from 'ethers'
 import { approveAbi } from '../shared/abi/approve__abi'
 import { networkConfig } from '../shared/config'
-import { scenario0 } from './scenarios'
 import { OmniPools } from '../shared/data'
+import { scenario0 } from './scenarios'
+import { MaxUint256 } from '@ethersproject/constants'
 
 async function swapErc20() {
     try {
+        if (!scenario0.signer) throw new Error('Signer not provided')
+
         const pool = OmniPools[scenario0?.fromChainId]
         if (!pool) throw new Error('Pool not exist')
 
@@ -44,19 +47,21 @@ async function swapErc20() {
             approveTo,
         })
 
-        return
-
         if (!scenario0.tokenAmountIn.token.isNative) {
             console.log('Approving...')
             const tokenContract = new Contract(
                 scenario0.tokenAmountIn.token.address,
                 JSON.stringify(approveAbi),
-                scenario0.signer as any
+                scenario0.signer
             )
-            const approveResponse = await tokenContract.approve(
-                approveTo,
-                MaxUint256
+            const allowance: BigNumber = await tokenContract.allowance(
+                scenario0.signer.address,
+                approveTo
             )
+            console.log('allowance', allowance)
+
+            const approveResponse: TransactionResponse =
+                await tokenContract.approve(approveTo, MaxUint256)
             console.log('Approved', approveResponse.hash)
 
             const approveReceipt = await approveResponse.wait(1)
@@ -64,17 +69,18 @@ async function swapErc20() {
         }
 
         // Send transaction to chain
+
         const transactionResponse = await scenario0.signer.sendTransaction(
-            transactionRequest as any
+            transactionRequest
         )
         console.log('Transaction sent', transactionResponse.hash)
 
         // Wait for transaction to be mined
-        const receipt = await transactionResponse.wait(1)
-        console.log('Transaction mined', (receipt as any)?.transactionHash)
+        const receipt = await transactionResponse?.wait(1)
+        console.log('Transaction mined', receipt?.transactionHash)
 
         // Wait for transaction to be completed on recipient chain
-        const log = await swapping.waitForComplete(receipt as any)
+        const log = await swapping.waitForComplete(receipt)
         console.log('Cross-chain swap completed', log.transactionHash)
     } catch (e) {
         console.error(e)

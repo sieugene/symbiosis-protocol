@@ -1,6 +1,7 @@
 import { Chain, ChainId, Token, TokenAmount } from 'symbiosis-js-sdk'
 import { networkConfig } from '../shared/config'
 import { parseUnits } from '@ethersproject/units'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 // tokens
 const BSC_USDT = new Token({
@@ -26,10 +27,10 @@ export const scenario0 = {
     fromChainId: ChainId.BSC_TESTNET,
     toChainId: ChainId.MATIC_MUMBAI,
     tokenFrom: BSC_USDT,
-    tokenAmountIn: new TokenAmount(BSC_USDT, parseUnits('0.5').toString()),
+    tokenAmountIn: new TokenAmount(BSC_USDT, parseUnits('0.05').toString()),
     tokenTo: MATIC_USDT,
     signer: networkConfig.wallet.connect(
-        networkConfig.symbiosis.testnet.getProvider(ChainId.BSC_TESTNET) as any
+        new JsonRpcProvider('https://data-seed-prebsc-1-s2.bnbchain.org:8545')
     ),
     wallet: networkConfig.wallet,
 }
